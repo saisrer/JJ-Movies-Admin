@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JJ Movies Pro Admin</title>
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #0b0f19; color: #ffffff; padding: 20px; margin: 0; }
+        .container { max-width: 600px; margin: auto; }
+        .card { background: #111827; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); margin-bottom: 20px; border: 1px solid #1f2937; }
+        h2 { color: #f43f5e; margin-bottom: 15px; font-size: 20px; }
+        label { display: block; margin-top: 12px; font-weight: bold; color: #9ca3af; font-size: 14px; }
+        input, textarea, select { width: 100%; padding: 12px; margin-top: 6px; background: #1f2937; border: 1px solid #374151; color: #fff; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
+        button { width: 100%; background: #f43f5e; color: white; padding: 12px; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; margin-top: 20px; cursor: pointer; transition: background 0.2s; }
+        button:hover { background: #e11d48; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Add Movie Card -->
+        <div class="card">
+            <h2>Add Movie</h2>
+            <form id="movieForm">
+                <label>Movie Title *</label>
+                <input type="text" id="title" required placeholder="e.g. Devara / Salaar">
+
+                <label>Release Year</label>
+                <input type="text" id="release_year" placeholder="e.g. 2026">
+
+                <label>Runtime</label>
+                <input type="text" id="runtime" placeholder="e.g. 2h 45m">
+
+                <label>Poster URL (From Posters Channel ID: 3775061760)</label>
+                <input type="text" id="poster" required placeholder="Paste direct poster image link">
+
+                <label>Description</label>
+                <textarea id="description" rows="3" required placeholder="Enter movie storyline..."></textarea>
+
+                <button type="submit">Save Movie Details</button>
+            </form>
+        </div>
+
+        <!-- Manage Movie Quality Links Card (Telegram Stream Links) -->
+        <div class="card">
+            <h2>Manage Movie Quality & Telegram Stream Links</h2>
+            <form id="qualityForm">
+                <label>Movie Title (Exact title given above)</label>
+                <input type="text" id="q_movie_title" required placeholder="Enter exact movie title">
+
+                <label>Video Quality *</label>
+                <select id="video_quality">
+                    <option value="1080p (Full HD)">1080p (Full HD)</option>
+                    <option value="720p (HD)">720p (HD)</option>
+                    <option value="480p">480p</option>
+                </select>
+
+                <label>Audio Language *</label>
+                <select id="audio_language">
+                    <option value="Telugu">Telugu</option>
+                    <option value="Hindi">Hindi</option>
+                    <option value="Tamil">Tamil</option>
+                    <option value="English">English</option>
+                </select>
+
+                <label>Telegram Message Link (From Movies Channel ID: 3819252896)</label>
+                <input type="text" id="telegram_link" required placeholder="https://t.me/c/3819252896/...">
+
+                <button type="submit" style="background: #10b981;">Save Quality Link</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Supabase Credentials Integrated Successfully
+        const SUPABASE_URL = 'https://nwvjbdiifmdqiyparcbm.supabase.co';
+        const SUPABASE_ANON_KEY = 'Sb_publishable_wrzX413fjkXqz6P-WplB6Q_bN5lAJLh';
+
+        const { createClient } = supabase;
+        const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // 1. Add Movie Logic
+        document.getElementById('movieForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('title').value;
+            const release_year = document.getElementById('release_year').value;
+            const runtime = document.getElementById('runtime').value;
+            const poster = document.getElementById('poster').value;
+            const description = document.getElementById('description').value;
+
+            const { error } = await _supabase
+                .from('movies')
+                .insert([{ title, release_year, runtime, poster, description }]);
+
+            if (error) {
+                alert('Error: ' + error.message);
+            } else {
+                alert('Movie Added Successfully!');
+                document.getElementById('movieForm').reset();
+            }
+        });
+
+        // 2. Add Telegram Stream Link Logic
+        document.getElementById('qualityForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const movie_title = document.getElementById('q_movie_title').value;
+            const video_quality = document.getElementById('video_quality').value;
+            const audio_language = document.getElementById('audio_language').value;
+            const telegram_link = document.getElementById('telegram_link').value;
+
+            const { error } = await _supabase
+                .from('movie_links')
+                .insert([{ movie_title, video_quality, audio_language, telegram_link }]);
+
+            if (error) {
+                alert('Error: ' + error.message);
+            } else {
+                alert('Telegram Stream Link Saved Successfully!');
+                document.getElementById('qualityForm').reset();
+            }
+        });
+    </script>
+</body>
+</html>
